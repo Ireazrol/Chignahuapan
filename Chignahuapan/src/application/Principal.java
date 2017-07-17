@@ -42,6 +42,8 @@ public class Principal {
 	private JMap map = new JMap();
 	private GroupLayer groupLayer = new GroupLayer();
 	EventoMapa eventoMapa = new EventoMapa();
+	EventoCombos eventoCombos = new EventoCombos();
+	Botones botones = new Botones();
 	/**
 	 * Launch the application.
 	 */
@@ -507,12 +509,15 @@ public class Principal {
 		btnAgregarCapa.setToolTipText("Agregar capa");
 		btnAgregarCapa.setIcon(new ImageIcon(Principal.class.getResource("/com/esri/client/toolkit/images/LayerSelect16.png")));
 		btnAgregarCapa.setBackground(Color.WHITE);
+		botones.BtnAddLayer(btnAgregarCapa, map);
 		toolBar.add(btnAgregarCapa);
 		
 		JComboBox cmbScala = new JComboBox();
+		cmbScala.setEditable(true);
 		cmbScala.setBackground(Color.WHITE);
 		cmbScala.setModel(new DefaultComboBoxModel(new String[] {"1:1.000", "1:10.000", "1:24.000", "1:100.000", "1:250.000", "1:500.000", "1:750.000", "1:1.000.000", "1:3.000.000", "1:10.000.000"}));
 		cmbScala.setSelectedIndex(1);
+		eventoCombos.eventoCmbScala(cmbScala, map); 
 		toolBar.add(cmbScala);
 		
 		JButton btnEditor = new JButton("");

@@ -68,7 +68,6 @@ public class EventoMapa {
 //		map.setAutoscrolls(false);
 //		map.setFocusable(false);
 //		map.setFocusCycleRoot(false);
-//		map.setScale(1.000);
 		cargarMapasLayer(map, 0, groupLayer);
 		//seleccionarPredio(map);
 	}
