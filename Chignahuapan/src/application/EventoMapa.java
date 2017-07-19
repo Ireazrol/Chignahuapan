@@ -25,10 +25,15 @@ import javax.swing.tree.TreePath;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.esri.client.local.ArcGISLocalDynamicMapServiceLayer;
+import com.esri.client.local.ArcGISLocalFeatureLayer;
 import com.esri.client.local.ArcGISLocalTiledLayer;
+import com.esri.core.geodatabase.Geodatabase;
+import com.esri.core.geodatabase.GeodatabaseFeature;
 import com.esri.core.geometry.Envelope;
 import com.esri.core.map.Feature;
 import com.esri.core.map.LayerLegendInfo;
+import com.esri.core.map.LayerLegendInfoCollection;
 import com.esri.core.map.LegendItemInfo;
 import com.esri.core.renderer.SimpleRenderer;
 import com.esri.core.renderer.UniqueValueRenderer;
@@ -37,12 +42,14 @@ import com.esri.map.ArcGISFeatureLayer;
 import com.esri.map.ArcGISTiledMapServiceLayer;
 import com.esri.map.GroupLayer;
 import com.esri.map.JMap;
+import com.esri.map.Layer;
 import com.esri.map.LayerInfo;
 import com.esri.map.LayerInitializeCompleteEvent;
 import com.esri.map.LayerInitializeCompleteListener;
 import com.esri.map.LayerList;
 import com.esri.map.MapEvent;
 import com.esri.map.MapEventListenerAdapter;
+import com.esri.runtime.ArcGISRuntime;
 import com.esri.map.Layer.LayerStatus;
 import com.esri.toolkit.legend.JLegend;
 import com.esri.toolkit.overlays.HitTestEvent;
@@ -76,9 +83,12 @@ public class EventoMapa {
 		 String urlMapa = urlMapOnline;
 		if (url == 1) {
 			urlMapa = urlMapLocal;
-			final ArcGISLocalTiledLayer tiledLayer = new ArcGISLocalTiledLayer("C:\\Program Files (x86)\\ArcGIS SDKs\\java10.2.4\\sdk\\samples\\data\\tpks\\chignahuapanSDE.tpk");
-			tiledLayer.setName("Local");
-			map.getLayers().add(tiledLayer);
+			try {
+				mapaLocal (map);
+			} catch (Exception e) { 
+				System.out.println(" exception " + e);
+			}
+			
 	        map.setExtent(new Envelope(-1.0914563461473859E7, 2251658.6830414305, -1.0909068825257503E7, 2255260.8421374366));
 		} else {
 			map.setExtent(new Envelope(-1.0914563461473859E7, 2251658.6830414305, -1.0909068825257503E7, 2255260.8421374366));
@@ -131,9 +141,48 @@ public class EventoMapa {
 		}
 	}
 	
-	public void agregarEvento(JMap map, List<ArcGISFeatureLayer> lista) {
+	public void mapaLocal (JMap map) {
+		ArcGISLocalTiledLayer tiledLayer = new ArcGISLocalTiledLayer("C:\\Program Files (x86)\\ArcGIS SDKs\\java10.2.4\\sdk\\samples\\data\\tpks\\chignahuapanSDE.tpk");
+		ArcGISRuntime arcGISRuntime = new ArcGISRuntime();
+		map.getLayers().add(tiledLayer);
+		System.out.println("tiledLayerdsdsd"+tiledLayer);
+		tiledLayer.addLayerInitializeCompleteListener(new LayerInitializeCompleteListener() {
+			@Override
+			public void layerInitializeComplete(LayerInitializeCompleteEvent e) {
+				if (tiledLayer.getStatus() == LayerStatus.INITIALIZED) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {  
+							
+							LayerLegendInfoCollection layerLegendInfoCollection = tiledLayer.getLegend();
+							List<LayerLegendInfo> listaLayer= layerLegendInfoCollection.getLayerLegendInfos();
+							if (listaLayer != null) {
+								for (LayerLegendInfo layerLegendInfo: listaLayer) { 
+									System.out.println(" id "+layerLegendInfo.getLayerId()+ " name " + layerLegendInfo.getLayerName()+ " type " +layerLegendInfo.getLayerType() + " url "+layerLegendInfo.getServiceUrl());
+									ArcGISLocalFeatureLayer arcGISLocalFeatureLayer = new ArcGISLocalFeatureLayer("C:\\Program Files (x86)\\ArcGIS SDKs\\java10.2.4\\sdk\\samples\\data\\tpks\\chignahuapanSDE.tpk", layerLegendInfo.getLayerId());
+									System.out.println("tiledLayer "+arcGISLocalFeatureLayer);	
+									map.getLayers().add(arcGISLocalFeatureLayer);
+									arcGISLocalFeatureLayer.addLayerInitializeCompleteListener(new LayerInitializeCompleteListener() {
+										@Override
+										public void layerInitializeComplete(LayerInitializeCompleteEvent e) {
+											System.out.println("arcGISLocalFeatureLayer.getStatus() " +arcGISLocalFeatureLayer.getStatus());
+											if (arcGISLocalFeatureLayer.getStatus() == LayerStatus.INITIALIZED) {
+												
+											}
+										}
+									});
+								}
+							}
+						}
+					});
+				}
+			}
+		});
+	}
+	
+	public void agregarEvento(JMap map, List<ArcGISFeatureLayer> lista ) {
 		System.out.println(" prueba " + map.getLayers());
-		for (int i = 0; i < lista.size(); i++) {
+		for (int i = 0; i < lista.size(); i++) {  
 			seleccionarPredio(map, lista.get(i));
 			ArcGISFeatureLayer arcGISFeatureLayer = lista.get(i);
 		}
@@ -157,7 +206,6 @@ public class EventoMapa {
 			@Override
 			public void featureHit(HitTestEvent event) {
 				HitTestOverlay overlay = (HitTestOverlay) event.getSource();
-				System.out.println(" id " + overlay.getHitFeatures());
 				List<Feature> hitFeatures = overlay.getHitFeatures();
 				ArcGISFeatureLayer arcGISFeatureLayer = (ArcGISFeatureLayer) overlay.getLayer();
 				for (Feature feature : hitFeatures) {
@@ -206,24 +254,47 @@ public class EventoMapa {
 								TreePath path = jTree.getPathForLocation(arg0.getX(), arg0.getY());
 								Object[] objects = path.getPath();
 								LayerLegendInfo layerLegendInfo = null;
+								ArcGISLocalTiledLayer arcGISLocalTiledLayer = null;
 								LegendItemInfo legendItemInfo= null;
 								ArcGISFeatureLayer arcGISFeatureLayer = null;
+								int localOnline=1;
 								if (objects.length > 3) {
 									for (int i=0; i<objects.length; i++) { 
 										System.out.println(" lenhgt " + objects[i]);
-										if (i==2 ) {
-											DefaultMutableTreeNode defaultMutableTreeNode  = (DefaultMutableTreeNode) objects[i];
-											arcGISFeatureLayer =  (ArcGISFeatureLayer) defaultMutableTreeNode.getUserObject();
-											//layerLegendInfo = (LayerLegendInfo) defaultMutableTreeNode.getUserObject();
+										if (i==1) {
+											try {
+												DefaultMutableTreeNode defaultMutableTreeNode  = (DefaultMutableTreeNode) objects[i];
+												arcGISLocalTiledLayer = (ArcGISLocalTiledLayer) defaultMutableTreeNode.getUserObject();
+											} catch (Exception e) { 
+												localOnline=0;
+											}
+										}
+										if (localOnline ==0) {
+											if (i==2 ) {
+												DefaultMutableTreeNode defaultMutableTreeNode  = (DefaultMutableTreeNode) objects[i];
+												arcGISFeatureLayer =  (ArcGISFeatureLayer) defaultMutableTreeNode.getUserObject();
+											}
+										}else {
+											if (i==2 ) {
+												DefaultMutableTreeNode defaultMutableTreeNode  = (DefaultMutableTreeNode) objects[i];
+												layerLegendInfo =  (LayerLegendInfo) defaultMutableTreeNode.getUserObject();
+											}
 										}
 										//System.out.println("path " + objects[i]);
 										if ((i+1) == objects.length) {
 											//System.out.println(" i " + i + " objects[i] " +objects[i]);
-											DefaultMutableTreeNode arcGISLocalTiledLayer = (DefaultMutableTreeNode) objects[i];
-											legendItemInfo = (LegendItemInfo) arcGISLocalTiledLayer.getUserObject();
-										} 
+											DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) objects[i];
+											legendItemInfo = (LegendItemInfo) defaultMutableTreeNode.getUserObject();
+										}
 									}
-									seleccionarLayer(map, arcGISFeatureLayer, legendItemInfo);
+									if (localOnline ==0) {
+										seleccionarLayer(map, arcGISFeatureLayer, legendItemInfo);
+									} else {
+										
+										System.out.println(" map.getLayers().get(1) " + map.getLayers().get(1) );
+										
+									}
+									
 									if (defaultTreeModel != null) {
 										defaultTreeModel.reload();
 									}

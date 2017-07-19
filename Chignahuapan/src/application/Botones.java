@@ -115,4 +115,16 @@ public class Botones {
 	    drawingOverlayu.setActive(true);
 	    return drawingOverlayu;
 	}
+	
+	
+	
+	public void eventoBotonesMapa (JButton btnButton, JMap map, GroupLayer groupLayer, int localOnline, EventoMapa eventoMapa) {
+		btnButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				eventoMapa.cargarMapasLayer(map, localOnline, groupLayer); 
+			}
+		});
+	}
+	
 }
