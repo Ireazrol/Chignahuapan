@@ -68,7 +68,7 @@ public class EventoMapa {
 	List<ArcGISFeatureLayer> listaArcGisFeatureLayer = new ArrayList<ArcGISFeatureLayer>();
 	
 	public void crearMapaPuebla(GroupLayer groupLayer, JMap map) {
-		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
+		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer");
 		LayerList layers = map.getLayers();
 		baseLayer.setName("Mapa Base");
 		layers.add(baseLayer);
@@ -77,6 +77,30 @@ public class EventoMapa {
 //		map.setFocusCycleRoot(false);
 		cargarMapasLayer(map, 0, groupLayer);
 		//seleccionarPredio(map);
+	}
+	
+	public void changeBaseLayer(GroupLayer groupLayer, JMap map, String nameBaseLayer){
+		System.out.println("Entré al método changeBaseLayer");
+		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer(nameBaseLayer);
+		baseLayer.setName("Mapa Base");
+		
+		System.out.println("Base Layer status : "+baseLayer.getStatus());
+//		for (int i = 0; i < map.getLayers().size(); i++) {
+//			
+//			if (map.getLayers().get(i) != null) {
+//				if(map.getLayers().get(i).getName() != null){
+//					if(map.getLayers().get(i).getName().equals("Mapa Base")){
+//						System.out.println("Encontré el mapa base : "+map.getLayers().get(i));
+//						map.getLayers().remove(i);
+//					}
+//					break;
+//				}
+//			}
+//		}
+		
+		System.out.println("Antes de agregar Mapsdfffdsssssss : \n"+map.getLayers());
+		map.getLayers().add(baseLayer);
+		System.out.println("Mapsdfffdsssssss : \n"+map.getLayers());
 	}
 	
 	public void cargarMapasLayer(JMap map, int url, GroupLayer groupLayer) {

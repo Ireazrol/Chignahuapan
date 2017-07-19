@@ -8,6 +8,7 @@ import com.esri.map.JMap;
 
 public class EventoCombos {
 	
+	
 	public void eventoCmbScala (JComboBox cmbScala, JMap map) {
 		cmbScala.addActionListener(new ActionListener() {
 	            @Override
@@ -20,5 +21,26 @@ public class EventoCombos {
 	            } 
 	        });
 	}
-
+	
+	public void CmbBaseLayer (JComboBox CmbBaseLayer) {
+		CmbBaseLayer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) { 
+				int numItem= CmbBaseLayer.getSelectedIndex();
+				switch (numItem) {
+				case 0:
+					System.out.println("Cero");
+					break;
+				case 1:
+					VentanasDinamicas.main(null);
+					break;
+				case 2:
+					System.out.println("Dos");
+					break;
+				default:
+					break;
+				}
+			} 
+		});
+	}
 }

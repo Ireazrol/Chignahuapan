@@ -58,6 +58,9 @@ public class Principal {
 	Botones botones = new Botones();
 	EditarPredios editarPredios = new EditarPredios();
 	
+	public GroupLayer getGroupLayer(){ return this.groupLayer; }
+	public JMap getJmap(){ return this.map; }
+	
 	/**
 	 * Launch the application.
 	 */
@@ -729,13 +732,16 @@ public class Principal {
 		separator_22.setOrientation(SwingConstants.VERTICAL);
 		toolBar.add(separator_22);
 		
-		JButton btnAgregarCapa = new JButton("");
-		btnAgregarCapa.setToolTipText("Agregar capa");
-		btnAgregarCapa.setIcon(new ImageIcon(Principal.class.getResource("/com/esri/client/toolkit/images/LayerSelect16.png")));
-		btnAgregarCapa.setBackground(Color.WHITE);
-		botones.BtnAddLayer(btnAgregarCapa, map);
-		btnAgregarCapa.setBorder(BorderFactory.createCompoundBorder( BorderFactory.createLineBorder(Color.white, 1), BorderFactory.createLineBorder(Color.white,2)));
-		toolBar.add(btnAgregarCapa);
+		JComboBox CmbBaseLayer = new JComboBox();
+		String[] images = {"/com/esri/client/toolkit/images/LayerGeneric16.png", 
+				  "/com/esri/client/toolkit/images/LayerPolygon16.png", 
+				  "/com/esri/client/toolkit/images/LayerServiceMap16.png"};
+		for(int i= 0; i< images.length; i++){
+			ImageIcon icon = new ImageIcon(Principal.class.getResource(images[i]));
+			CmbBaseLayer.addItem(icon);
+		}
+		eventoCombos.CmbBaseLayer(CmbBaseLayer);
+		toolBar.add(CmbBaseLayer);
 		
 		JSeparator separator_23 = new JSeparator();
 		separator_23.setOrientation(SwingConstants.VERTICAL);

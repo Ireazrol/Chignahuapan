@@ -2,9 +2,13 @@ package application;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
+
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
@@ -21,6 +25,8 @@ import com.esri.toolkit.overlays.DrawingOverlay.DrawingMode;
 public class Botones {
 	private int numLayer=1;    
 	private GroupLayer groupLayer;
+	String nameBaseLayer ="";
+	
 	
 	public GroupLayer BtnAddLayer(JButton btnAgregarData, JMap map){
 		btnAgregarData.addActionListener(new ActionListener() {
@@ -35,6 +41,36 @@ public class Botones {
             }
         });
 		return groupLayer;
+	}
+	
+	public void choiceBaseLayer(JLabel label, JLabel lblaux, int num){
+		System.out.println("Entré al método choiceBaseLayer");
+		label.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				lblaux.setText(addBaseLayer(num));
+			}
+		});
+	}
+	
+	public String addBaseLayer(int num){
+		String nameBaseLayer ="";
+		String [] arrayBaseLayer={"https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer",
+				"https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer",
+				"https://services.arcgisonline.com/arcgis/rest/services/World_Shaded_Relief/MapServer",
+				"https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer",
+				"https://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer",
+				"https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"};
+		nameBaseLayer= arrayBaseLayer[num];
+		return nameBaseLayer;
 	}
 	
 	public void BtnRectangle(DrawingOverlay drawingOverlayu,JButton rectangleButton){
