@@ -27,8 +27,8 @@ import java.awt.event.ActionEvent;
 
 public class VentanasDinamicas extends JFrame{
 	Botones botones = new Botones();
-	EventoMapa eventoMapa = new EventoMapa();
-	Principal principal = new Principal();
+	//EventoMapa eventoMapa = new EventoMapa();
+	//Principal principal = new Principal();
 	
 	String auxNameBaseLayer="";
 	
@@ -37,23 +37,23 @@ public class VentanasDinamicas extends JFrame{
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanasDinamicas frame = new VentanasDinamicas();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					VentanasDinamicas frame = new VentanasDinamicas();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
 	 */
-	public VentanasDinamicas() {
+	public VentanasDinamicas(JMap map, GroupLayer groupLayer) {
 		setTitle("Agregar Mapa Base");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 600, 420);
@@ -191,7 +191,7 @@ public class VentanasDinamicas extends JFrame{
 		JButton btnAdd = new JButton("Agregar");
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				eventoMapa.changeBaseLayer(principal.getGroupLayer(), principal.getJmap(), lblAux.getText());
+				EventoMapa.changeBaseLayer(groupLayer, map, lblAux.getText());
 				dispose();
 			}
 		});

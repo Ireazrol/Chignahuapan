@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 
+import com.esri.map.GroupLayer;
 import com.esri.map.JMap;
 
 public class EventoCombos {
@@ -22,7 +23,7 @@ public class EventoCombos {
 	        });
 	}
 	
-	public void CmbBaseLayer (JComboBox CmbBaseLayer) {
+	public void CmbBaseLayer (JComboBox CmbBaseLayer, JMap map, GroupLayer groupLayer) {
 		CmbBaseLayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) { 
@@ -32,7 +33,10 @@ public class EventoCombos {
 					System.out.println("Cero");
 					break;
 				case 1:
-					VentanasDinamicas.main(null);
+					//VentanasDinamicas.main(null);
+					VentanasDinamicas frame = new VentanasDinamicas(map, groupLayer);
+					
+					frame.setVisible(true);
 					break;
 				case 2:
 					System.out.println("Dos");

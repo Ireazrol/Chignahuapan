@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
+import com.esri.map.ArcGISFeatureLayer;
 import com.esri.map.ArcGISTiledMapServiceLayer;
 import com.esri.map.GroupLayer;
 import com.esri.map.JMap;
@@ -22,15 +23,23 @@ import java.awt.ScrollPane;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import java.awt.Component;
+import java.awt.Cursor;
+
 import javax.swing.JToolBar;
 import java.awt.Scrollbar;
+import java.awt.Toolkit;
+
 import javax.swing.JSplitPane;
 import java.awt.Panel;
+import java.awt.Point;
+
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -45,18 +54,20 @@ import java.awt.Choice;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
 public class Principal {
 
-	private JFrame frame;
+	static JFrame frame;
 	private JMap map = new JMap();
 	private GroupLayer groupLayer = new GroupLayer();
 	EventoMapa eventoMapa = new EventoMapa();
 	EventoCombos eventoCombos = new EventoCombos();
 	Botones botones = new Botones();
 	EditarPredios editarPredios = new EditarPredios();
+	static List<ArcGISFeatureLayer> listaArcGisFeatureLayer = new ArrayList<ArcGISFeatureLayer>();
 	
 	public GroupLayer getGroupLayer(){ return this.groupLayer; }
 	public JMap getJmap(){ return this.map; }
@@ -740,7 +751,7 @@ public class Principal {
 			ImageIcon icon = new ImageIcon(Principal.class.getResource(images[i]));
 			CmbBaseLayer.addItem(icon);
 		}
-		eventoCombos.CmbBaseLayer(CmbBaseLayer);
+		eventoCombos.CmbBaseLayer(CmbBaseLayer, map, groupLayer);
 		toolBar.add(CmbBaseLayer);
 		
 		JSeparator separator_23 = new JSeparator();
@@ -1014,6 +1025,20 @@ public class Principal {
 		toolBar_1.add(separator_30);
 		
 		JButton btnEditTool = new JButton("");
+		btnEditTool.setSelectedIcon(new ImageIcon(Principal.class.getResource("/com/esri/map/resources/GenericBlackRightArrowNoTail16.png")));
+		btnEditTool.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) { 
+				if(map.getCursor().getType()==-1) {  
+					map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				}else {
+					Image im = Toolkit.getDefaultToolkit().createImage(Principal.class.getResource("/imagenes/img/cursor1.png")); 
+					Cursor cur = Toolkit.getDefaultToolkit().createCustomCursor(im, new Point(2,2),"WILL"); 
+					map.setCursor(cur ); 
+					eventoMapa.agregarEvento(map, listaArcGisFeatureLayer);  
+					System.out.println("typo cursor " + map.getCursor().getType());					
+				}
+			}
+		});
 		btnEditTool.setToolTipText("Edit Tool");
 		btnEditTool.setIcon(new ImageIcon(Principal.class.getResource("/imagenes/img/editTol.png")));
 		btnEditTool.setBackground(Color.WHITE);

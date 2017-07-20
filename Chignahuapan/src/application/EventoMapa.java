@@ -49,6 +49,8 @@ import com.esri.map.LayerInitializeCompleteListener;
 import com.esri.map.LayerList;
 import com.esri.map.MapEvent;
 import com.esri.map.MapEventListenerAdapter;
+import com.esri.map.MapOptions;
+import com.esri.map.MapOptions.MapType;
 import com.esri.runtime.ArcGISRuntime;
 import com.esri.map.Layer.LayerStatus;
 import com.esri.toolkit.legend.JLegend;
@@ -68,38 +70,34 @@ public class EventoMapa {
 	List<ArcGISFeatureLayer> listaArcGisFeatureLayer = new ArrayList<ArcGISFeatureLayer>();
 	
 	public void crearMapaPuebla(GroupLayer groupLayer, JMap map) {
-		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer");
+		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer");
 		LayerList layers = map.getLayers();
 		baseLayer.setName("Mapa Base");
 		layers.add(baseLayer);
-//		map.setAutoscrolls(false);
-//		map.setFocusable(false);
-//		map.setFocusCycleRoot(false);
 		cargarMapasLayer(map, 0, groupLayer);
-		//seleccionarPredio(map);
 	}
 	
-	public void changeBaseLayer(GroupLayer groupLayer, JMap map, String nameBaseLayer){
+	public static void changeBaseLayer(GroupLayer groupLayer, JMap map, String nameBaseLayer){
 		System.out.println("Entré al método changeBaseLayer");
+//		MapOptions mapOptions = new MapOptions(MapType.STREETS);
+//		map.setMapOptions(mapOptions);
 		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer(nameBaseLayer);
 		baseLayer.setName("Mapa Base");
-		
-		System.out.println("Base Layer status : "+baseLayer.getStatus());
-//		for (int i = 0; i < map.getLayers().size(); i++) {
-//			
-//			if (map.getLayers().get(i) != null) {
-//				if(map.getLayers().get(i).getName() != null){
-//					if(map.getLayers().get(i).getName().equals("Mapa Base")){
-//						System.out.println("Encontré el mapa base : "+map.getLayers().get(i));
-//						map.getLayers().remove(i);
-//					}
-//					break;
-//				}
-//			}
-//		}
+		System.out.println("Base Layer status : "+baseLayer.getStatus() + " size " + map.getLayers().size());
+		for (int i = 0; i < map.getLayers().size(); i++) {
+			if (map.getLayers().get(i) != null) {
+				if(map.getLayers().get(i).getName() != null){
+					if(map.getLayers().get(i).getName().equals("Mapa Base")){
+						map.getLayers().remove(i);
+					}
+					break;
+				}
+			}
+		}
 		
 		System.out.println("Antes de agregar Mapsdfffdsssssss : \n"+map.getLayers());
 		map.getLayers().add(baseLayer);
+		//cargarMapasLayer(map, 0, groupLayer);
 		System.out.println("Mapsdfffdsssssss : \n"+map.getLayers());
 	}
 	
@@ -135,6 +133,7 @@ public class EventoMapa {
 										LayerInfo layerInfo = (LayerInfo) listaLayers.values().toArray()[i];
 										ArcGISFeatureLayer arcGISFeatureLayer = new ArcGISFeatureLayer( urlMapOnline + "/" + layerInfo.getId());
 										map.getLayers().add(arcGISFeatureLayer);
+										
 										arcGISFeatureLayer.addLayerInitializeCompleteListener(new LayerInitializeCompleteListener() {
 											@Override
 											public void layerInitializeComplete(LayerInitializeCompleteEvent e) {
@@ -142,7 +141,7 @@ public class EventoMapa {
 													groupLayer.add(arcGISFeatureLayer);
 													listaArcGisFeatureLayer.add(arcGISFeatureLayer);
 													if (listaArcGisFeatureLayer.size() == listaLayers.size()) {
-														agregarEvento(map, listaArcGisFeatureLayer);
+														Principal.listaArcGisFeatureLayer = listaArcGisFeatureLayer;
 													}
 												}
 											}
@@ -176,8 +175,7 @@ public class EventoMapa {
 				if (tiledLayer.getStatus() == LayerStatus.INITIALIZED) {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
-						public void run() {  
-							
+						public void run() { 							
 							LayerLegendInfoCollection layerLegendInfoCollection = tiledLayer.getLegend();
 							List<LayerLegendInfo> listaLayer= layerLegendInfoCollection.getLayerLegendInfos();
 							if (listaLayer != null) {
@@ -204,11 +202,12 @@ public class EventoMapa {
 		});
 	}
 	
-	public void agregarEvento(JMap map, List<ArcGISFeatureLayer> lista ) {
+	public void agregarEvento(JMap map, List<ArcGISFeatureLayer> lista) {
 		System.out.println(" prueba " + map.getLayers());
-		for (int i = 0; i < lista.size(); i++) {  
+		for (int i = 0; i < lista.size(); i++) {   
 			seleccionarPredio(map, lista.get(i));
 			ArcGISFeatureLayer arcGISFeatureLayer = lista.get(i);
+//			arcGISFeatureLayer.sele
 		}
 	}
 	
@@ -223,13 +222,17 @@ public class EventoMapa {
 		HitTestListener listener = SeleccionarPredio();
 		final HitTestOverlay selectionOverlay = new HitTestOverlay(arcGISFeatureLayer, listener);
 		map.addMapOverlay(selectionOverlay);
+		
+		
 	}
 	
 	public HitTestListener SeleccionarPredio() {
 		HitTestListener listener = new HitTestListener() {
-			@Override
+			@Override 
 			public void featureHit(HitTestEvent event) {
+				//System.out.println(" event " +event.getSource() ); 
 				HitTestOverlay overlay = (HitTestOverlay) event.getSource();
+				//System.out.println(" overlay " +overlay.getHitFeatures() );
 				List<Feature> hitFeatures = overlay.getHitFeatures();
 				ArcGISFeatureLayer arcGISFeatureLayer = (ArcGISFeatureLayer) overlay.getLayer();
 				for (Feature feature : hitFeatures) {

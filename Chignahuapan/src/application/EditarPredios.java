@@ -30,6 +30,7 @@ import com.esri.core.geometry.Point;
 import com.esri.core.geometry.Polygon;
 import com.esri.core.geometry.Polyline;
 import com.esri.core.map.CallbackListener;
+import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureEditResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.SimpleLineSymbol;
@@ -44,6 +45,9 @@ import com.esri.toolkit.overlays.DrawingCompleteEvent;
 import com.esri.toolkit.overlays.DrawingCompleteListener;
 import com.esri.toolkit.overlays.DrawingOverlay;
 import com.esri.toolkit.overlays.DrawingOverlay.DrawingMode;
+import com.esri.toolkit.overlays.HitTestEvent;
+import com.esri.toolkit.overlays.HitTestListener;
+import com.esri.toolkit.overlays.HitTestOverlay;
 
 import classes.Symbol;
 
@@ -119,6 +123,7 @@ public class EditarPredios {
 			Graphic grafics = graficos[0];
 	    	Geometry geometry = grafics.getGeometry(); 
 	    	final Polygon polygon = (Polygon) grafics.getGeometry();
+	    	System.out.println("polygon.getDimension() " + polygon.calculateArea2D());
 	    	for (int i=0; i<polygon.getPointCount(); i++) {
 				Point point= polygon.getPoint(i);
 				
@@ -135,8 +140,8 @@ public class EditarPredios {
 					arcGISFeatureLayer.updateGraphic(grafics.getUid(), geometry);
 				}
 			});
-	    	
 		}
 	}
+	
 	
 }
