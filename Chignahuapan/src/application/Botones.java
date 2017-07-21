@@ -4,9 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import com.esri.core.map.Graphic;
@@ -23,40 +24,33 @@ import com.esri.toolkit.overlays.DrawingOverlay;
 import com.esri.toolkit.overlays.DrawingOverlay.DrawingMode;
 
 public class Botones {
-	private int numLayer=1;    
-	private GroupLayer groupLayer;
 	String nameBaseLayer ="";
 	
 	
-	public GroupLayer BtnAddLayer(JButton btnAgregarData, JMap map){
+	/**
+	 * Descripción: Se agrega una nueva Capa en el mapa
+	 * El método tiene como parámetros
+	 * @param btnAgregarData
+	 * @param groupLayer
+	 * @param map
+	 */
+	public void BtnAddLayer(JComboBox btnAgregarData, GroupLayer groupLayer, JMap map){
 		btnAgregarData.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	EventoMapa eventoMapa = new EventoMapa();
-//            	eventoMapa.addLayers(map, numLayer);
-//            	eventoMapa.createNewLayer(map);
-//            	groupLayer = eventoMapa.createSubLayers(map, numLayer);
-            	map.getLayers().add(groupLayer);
-            	numLayer++;
-            }
-        });
-		return groupLayer;
-	}
-	
-	public void choiceBaseLayer(JLabel label, JLabel lblaux, int num){
-		System.out.println("Entré al método choiceBaseLayer");
-		label.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {}
-			@Override
-			public void mousePressed(MouseEvent e) {}
-			@Override
-			public void mouseExited(MouseEvent e) {}
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				lblaux.setText(addBaseLayer(num));
+			public void actionPerformed(ActionEvent e) {
+				int taille=groupLayer.size()+1;
+				
+				for(int i=1; i<map.getLayers().size(); i++){
+					map.getLayers().remove(i);
+				}
+//				ArcGISFeatureLayer arcGISFeatureLayer = new ArcGISFeatureLayer("");
+				GraphicsLayer graphicsLayer = new GraphicsLayer();
+				String nameLayer="Subcapa "+ taille;
+				graphicsLayer.setName(nameLayer);
+				groupLayer.add(graphicsLayer);
+				map.getLayers().add(groupLayer);
+				System.out.println("BtnAddLayer---->groupLayer:  \n"+groupLayer);
+				taille++;
 			}
 		});
 	}

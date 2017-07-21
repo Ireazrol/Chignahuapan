@@ -60,7 +60,7 @@ import java.awt.Insets;
 
 public class Principal {
 
-	static JFrame frame;
+	private JFrame frame;
 	private JMap map = new JMap();
 	private GroupLayer groupLayer = new GroupLayer();
 	EventoMapa eventoMapa = new EventoMapa();
@@ -68,9 +68,6 @@ public class Principal {
 	Botones botones = new Botones();
 	EditarPredios editarPredios = new EditarPredios();
 	static List<ArcGISFeatureLayer> listaArcGisFeatureLayer = new ArrayList<ArcGISFeatureLayer>();
-	
-	public GroupLayer getGroupLayer(){ return this.groupLayer; }
-	public JMap getJmap(){ return this.map; }
 	
 	/**
 	 * Launch the application.
@@ -751,7 +748,7 @@ public class Principal {
 			ImageIcon icon = new ImageIcon(Principal.class.getResource(images[i]));
 			CmbBaseLayer.addItem(icon);
 		}
-		eventoCombos.CmbBaseLayer(CmbBaseLayer, map, groupLayer);
+		eventoCombos.CmbBaseLayer(CmbBaseLayer, map, groupLayer, frame);
 		toolBar.add(CmbBaseLayer);
 		
 		JSeparator separator_23 = new JSeparator();

@@ -70,7 +70,7 @@ public class EventoMapa {
 	List<ArcGISFeatureLayer> listaArcGisFeatureLayer = new ArrayList<ArcGISFeatureLayer>();
 	
 	public void crearMapaPuebla(GroupLayer groupLayer, JMap map) {
-		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer");
+		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer");
 		LayerList layers = map.getLayers();
 		baseLayer.setName("Mapa Base");
 		layers.add(baseLayer);
@@ -78,27 +78,20 @@ public class EventoMapa {
 	}
 	
 	public static void changeBaseLayer(GroupLayer groupLayer, JMap map, String nameBaseLayer){
-		System.out.println("Entré al método changeBaseLayer");
-//		MapOptions mapOptions = new MapOptions(MapType.STREETS);
-//		map.setMapOptions(mapOptions);
 		ArcGISTiledMapServiceLayer baseLayer = new ArcGISTiledMapServiceLayer(nameBaseLayer);
 		baseLayer.setName("Mapa Base");
-		System.out.println("Base Layer status : "+baseLayer.getStatus() + " size " + map.getLayers().size());
+		GroupLayer groupLayerAux = new GroupLayer();
 		for (int i = 0; i < map.getLayers().size(); i++) {
-			if (map.getLayers().get(i) != null) {
-				if(map.getLayers().get(i).getName() != null){
-					if(map.getLayers().get(i).getName().equals("Mapa Base")){
-						map.getLayers().remove(i);
-					}
-					break;
+			if(map.getLayers().get(i) != null){
+				if (map.getLayers().get(i).getName().equals("Capas")) {
+					groupLayerAux.add(map.getLayers().get(i));
 				}
 			}
 		}
-		
-		System.out.println("Antes de agregar Mapsdfffdsssssss : \n"+map.getLayers());
+		map.getLayers().clear();
 		map.getLayers().add(baseLayer);
-		//cargarMapasLayer(map, 0, groupLayer);
-		System.out.println("Mapsdfffdsssssss : \n"+map.getLayers());
+		map.getLayers().add(groupLayerAux.getLayer("Capas"));
+		System.out.println("Map.getLayers() (after add) : \n"+map.getLayers());
 	}
 	
 	public void cargarMapasLayer(JMap map, int url, GroupLayer groupLayer) {
@@ -139,6 +132,7 @@ public class EventoMapa {
 											public void layerInitializeComplete(LayerInitializeCompleteEvent e) {
 												if (arcGISFeatureLayer.getStatus() == LayerStatus.INITIALIZED) {
 													groupLayer.add(arcGISFeatureLayer);
+													groupLayer.setName("Capas");
 													listaArcGisFeatureLayer.add(arcGISFeatureLayer);
 													if (listaArcGisFeatureLayer.size() == listaLayers.size()) {
 														Principal.listaArcGisFeatureLayer = listaArcGisFeatureLayer;
