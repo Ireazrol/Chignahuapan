@@ -23,7 +23,7 @@ import com.esri.toolkit.overlays.DrawingCompleteListener;
 import com.esri.toolkit.overlays.DrawingOverlay;
 import com.esri.toolkit.overlays.DrawingOverlay.DrawingMode;
 
-public class Botones {
+public class Botones{
 	String nameBaseLayer ="";
 	
 	
@@ -155,6 +155,10 @@ public class Botones {
 				eventoMapa.cargarMapasLayer(map, localOnline, groupLayer); 
 			}
 		});
+	}
+	
+	public void eventoBotonIniciar () {
+		
 	}
 	
 }
