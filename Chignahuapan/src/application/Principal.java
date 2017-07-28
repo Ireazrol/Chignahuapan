@@ -9,7 +9,6 @@ import java.awt.BorderLayout;
 
 import com.esri.arcgis.geoprocessing.GeoProcessor;
 import com.esri.arcgis.geoprocessing.tools.datamanagementtools.CreateFileGDB;
-import com.esri.arcgisruntime.localserver.LocalGeoprocessingService;
 import com.esri.core.tasks.ags.geoprocessing.Geoprocessor;
 import com.esri.map.ArcGISFeatureLayer;
 import com.esri.map.GroupLayer;
