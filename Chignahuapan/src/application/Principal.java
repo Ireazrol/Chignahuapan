@@ -7,9 +7,6 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-import com.esri.arcgis.geoprocessing.GeoProcessor;
-import com.esri.arcgis.geoprocessing.tools.datamanagementtools.CreateFileGDB;
-import com.esri.core.tasks.ags.geoprocessing.Geoprocessor;
 import com.esri.map.ArcGISFeatureLayer;
 import com.esri.map.GroupLayer;
 import com.esri.map.JMap;
@@ -876,6 +873,15 @@ public class Principal {
 		JSeparator separator_22 = new JSeparator();
 		menuBar_2.add(separator_22);
 		separator_22.setOrientation(SwingConstants.VERTICAL);
+		
+
+		String[] images = {"/com/esri/client/toolkit/images/LayerGeneric16.png", 
+				  "/com/esri/client/toolkit/images/LayerPolygon16.png", 
+				  "/com/esri/client/toolkit/images/LayerServiceMap16.png"};
+		for(int i= 0; i< images.length; i++){
+			ImageIcon icon = new ImageIcon(Principal.class.getResource(images[i]));
+			CmbBaseLayer.addItem(icon);
+		}
 		eventoCombos.CmbBaseLayer(CmbBaseLayer, map, groupLayer, frame);
 		menuBar_2.add(CmbBaseLayer);
 		
@@ -1094,13 +1100,6 @@ public class Principal {
 				panelBotones.add(toolBar);
 				panelBotones.add(toolBar_2);
 		
-		String[] images = {"/com/esri/client/toolkit/images/LayerGeneric16.png", 
-				  "/com/esri/client/toolkit/images/LayerPolygon16.png", 
-				  "/com/esri/client/toolkit/images/LayerServiceMap16.png"};
-		for(int i= 0; i< images.length; i++){
-			ImageIcon icon = new ImageIcon(Principal.class.getResource(images[i]));
-			CmbBaseLayer.addItem(icon);
-		}
 		panelFooter.setAlignmentY(Component.TOP_ALIGNMENT);
 		panelFooter.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
