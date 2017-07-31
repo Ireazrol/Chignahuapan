@@ -593,7 +593,10 @@ public class EventoMapa {
 	ArcGISFeatureLayer arcGISFeatureLayer = null;
 	Graphic graphic;
 	Graphic[] graphicsSeleccionados;
-
+	final SimpleMarkerSymbol SYM_POINT = new SimpleMarkerSymbol(Color.BLACK, 6, Style.DIAMOND);
+	SimpleLineSymbol SYM_LINE = new SimpleLineSymbol(Color.black, 1);
+	SimpleFillSymbol SYM_BUFFER = new SimpleFillSymbol(new Color(0, 0, 255, 80), SYM_LINE);
+	
 	public void dibujarSegment(JButton jButton, JMap map, List<ArcGISFeatureLayer> lista, JFrame frame) {
 		eliminarEventoOverlay(map);
 		 startOver = true;
@@ -610,113 +613,127 @@ public class EventoMapa {
 				}
 
 			}
-			final SimpleMarkerSymbol SYM_POINT = new SimpleMarkerSymbol(Color.BLACK, 6, Style.DIAMOND);
-			SimpleLineSymbol SYM_LINE = new SimpleLineSymbol(Color.black, 1);
-			SimpleFillSymbol SYM_BUFFER = new SimpleFillSymbol(new Color(0, 0, 255, 80), SYM_LINE);
-			map.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent event) {
-					if (validarPredioSeleccionado("", map, lista, frame) ==1) {
-						if (event.getClickCount() == 2) {
-							unirPredio(graphicsSeleccionados, map, arcGISFeatureLayer, polyLine, bufferedArea);
-							// start new on next click
-							 startOver = true;
-							 prevPoint = null;
-							 polyLine.setEmpty();
-							 return;
-						}
-
-						Point currPoint = map.toMapPoint(event.getX(), event.getY());
-						Graphic currPointGraphic = new Graphic(currPoint, SYM_POINT);
-						arcGISFeatureLayer.addGraphic(currPointGraphic);
-						if (prevPoint != null) {
-							Segment segment = new Line();
-							segment.setStart(prevPoint);
-							segment.setEnd(currPoint);
-							polyLine.addSegment(segment, false);
-							Graphic lineGraphic = new Graphic(polyLine, SYM_LINE);
-							arcGISFeatureLayer.addGraphic(lineGraphic);
-							bufferedArea = lineGraphic.getGeometry();
-						}
-						prevPoint = currPoint;
-						pintarLinea (map, currPoint);
-					}
-				}
-			});
-
+//			map.addMouseListener(new MouseAdapter() {
+//				@Override
+//				public void mouseClicked(MouseEvent event) {
+//					if (validarPredioSeleccionado("", map, lista, frame) ==1) {
+//						if (event.getClickCount() == 2) {
+//							unirPredio(graphicsSeleccionados, map, arcGISFeatureLayer, polyLine, bufferedArea);
+//							// start new on next click
+//							 startOver = true;
+//							 prevPoint = null;
+//							 polyLine.setEmpty();
+//							 return;
+//						}
+//
+//						Point currPoint = map.toMapPoint(event.getX(), event.getY());
+//						Graphic currPointGraphic = new Graphic(currPoint, SYM_POINT);
+//						arcGISFeatureLayer.addGraphic(currPointGraphic);
+//						if (prevPoint != null) {
+//							Segment segment = new Line();
+//							segment.setStart(prevPoint);
+//							segment.setEnd(currPoint);
+//							polyLine.addSegment(segment, false);
+//							Graphic lineGraphic = new Graphic(polyLine, SYM_LINE);
+//							arcGISFeatureLayer.addGraphic(lineGraphic);
+//							bufferedArea = lineGraphic.getGeometry();
+//						}
+//						prevPoint = currPoint;
+//						
+//					}
+//				}
+//			});
+			pintarLinea (map);
 		}
 	}
 	
 	private Point inicioArrastre;
 	private Point finArrastre;
-	private ArrayList<Shape> lineas = new ArrayList<Shape>();
-	private ArrayList<Polyline> listaLineas = new ArrayList<Polyline>();
-
-	public void pintarLinea (JMap map, Point currPoint) {
+	Graphic GraphicUltimo = null;
+	int id =0, idLinea=0;
+	boolean bandera=false;
+	public void pintarLinea (JMap map) {
 		map.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) { // cuando se presiona el  mouse
-				inicioArrastre = new Point(e.getX(), e.getY());
-				finArrastre = inicioArrastre;
-				paint();
+			public void mousePressed(MouseEvent event) { // cuando se presiona el  mouse  map.toMapPoint(event.getX(), event.getY())
+				inicioArrastre = map.toMapPoint(event.getX(), event.getY());
+				Graphic lineGraphic = new Graphic(inicioArrastre, SYM_POINT);
+	        	arcGISFeatureLayer.addGraphic(lineGraphic);
+	        	id= arcGISFeatureLayer.getGraphicIDs()[(arcGISFeatureLayer.getNumberOfGraphics()-1)];
+	        	idLinea =0;
+	        	bandera=true;
+	        	System.out.println("idLinea "+idLinea +" arcGISFeatureLayer.getNumberOfGraphics() "+arcGISFeatureLayer.getNumberOfGraphics() );
 			}
 
 			public void mouseReleased(MouseEvent e) { // cuando se deja de presionar el mouse
-				System.out.println(" mouseReleased  "+inicioArrastre);
-				if (inicioArrastre ==null) {
-					inicioArrastre = currPoint; 					
-				}
-				Point point = new Point();
-				point.setX(e.getX());
-				point.setY(e.getY()); 
-				Segment segment = new Line();
-				segment.setStart(inicioArrastre);
-				segment.setEnd(point);
-				Polyline polyline = new Polyline();
-				polyline.addSegment(segment, false);
-				listaLineas.add(polyline);
-				inicioArrastre = null;
-				finArrastre = null;
-				paint();
 			}
 		});
 		map.addMouseMotionListener(new  MouseMotionAdapter() {
-            public void mouseDragged(MouseEvent e) { // cuando se esta arrastrando el mouse
-            	finArrastre = new Point(e.getX(), e.getY());
-                paint();
+            public void mouseMoved(MouseEvent event) { // cuando se esta arrastrando el mouse
+            	if (bandera == true) {
+            		finArrastre = map.toMapPoint(event.getX(), event.getY());
+                	if (inicioArrastre != null && finArrastre != null) {
+                    	Polyline linea = new Polyline();
+                    	Segment segment = new Line();
+            			segment.setStart(inicioArrastre);
+            			segment.setEnd(finArrastre); 
+            			linea.addSegment(segment, false);
+            			Graphic GraphicLinea  = new Graphic(linea, SYM_LINE);
+            			if (idLinea==0) {
+            				arcGISFeatureLayer.addGraphic(GraphicLinea);
+            				obtenerId();
+            				idLinea= arcGISFeatureLayer.getGraphicIDs()[(arcGISFeatureLayer.getNumberOfGraphics()-1)];
+            			} else {
+            				arcGISFeatureLayer.updateGraphic(idLinea, GraphicLinea);
+            			}
+                    }
+            	}
+            	
             }
         });
 		
+		map.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent event) {
+				if (event.getClickCount() >= 2) {
+					bandera = false;
+				}
+
+			}
+		});
+
 	}
 	
-	  public void paint() {
-//		  polyLine.addSegment(segment, false);
-		  SimpleLineSymbol SYM_LINE = new SimpleLineSymbol(Color.red, 1);
-//			Graphic lineGraphic = new Graphic(polyLine, SYM_LINE);
-//			arcGISFeatureLayer.addGraphic(lineGraphic);
-//			
-//	        Graphics2D g2 = (Graphics2D) g;
-//	        g2.setColor(Color.RED);
-	       
-	        for (Polyline linea : listaLineas) { // dibuja todos las elipses
-	        	 Graphic lineGraphic = new Graphic(linea, SYM_LINE);
-	        	 arcGISFeatureLayer.addGraphic(lineGraphic);
-	        }
-	        if (inicioArrastre != null && finArrastre != null) { // se esta arrastrando el raton?
-	        	Polyline linea = new Polyline();
-	        	Segment segment = new Line();
-				segment.setStart(inicioArrastre);
-				segment.setEnd(finArrastre);
-				linea.addSegment(segment, false);
-				Graphic lineGraphic = new Graphic(linea, SYM_LINE);
-	        	arcGISFeatureLayer.addGraphic(lineGraphic);
-	            //g2.draw(linea);
-	        }
-	        
-	    }
-
-	    private Line2D.Double crearLinea(double x1, double y1, double x2, double y2) {
-	        return new Line2D.Double(x1, y1, x2, y2);
-	    }
+	public void obtenerId () {
+		if (arcGISFeatureLayer != null) {
+			for (int i=0; i<arcGISFeatureLayer.getNumberOfGraphics(); i++) {
+				int  ids= arcGISFeatureLayer.getGraphicIDs()[i]; 
+				Graphic graphic = arcGISFeatureLayer.getGraphic(ids); 
+				if ((i+1)==arcGISFeatureLayer.getNumberOfGraphics()) {
+					System.out.println(" uid " + graphic.getUid() +" id "+graphic.getId() +" ids " +ids+ " i " + i);					
+				}
+			}
+		}
+	}
+	
+  public void paint(Graphic lineGraphic, int id) {
+	  
+	  SimpleLineSymbol SYM_LINE = new SimpleLineSymbol(Color.red, 1);
+//        for (Polyline linea : listaLineas) { // dibuja todos las elipses
+//        	 lineGraphic = new Graphic(linea, SYM_LINE);
+//        	 //arcGISFeatureLayer.addGraphic(lineGraphic);
+//        	 arcGISFeatureLayer.updateGraphic(id, linea);
+//        }
+        if (inicioArrastre != null && finArrastre != null) { // se esta arrastrando el raton?
+        	Polyline linea = new Polyline();
+        	Segment segment = new Line();
+			segment.setStart(inicioArrastre);
+			segment.setEnd(finArrastre);
+			linea.addSegment(segment, false);
+			lineGraphic = new Graphic(linea, SYM_LINE);
+        	arcGISFeatureLayer.addGraphic(lineGraphic);
+        }
+        
+    }
 	
 	public void unirPredio(Graphic[] graphicSeleccionado, JMap map, ArcGISFeatureLayer arcGISFeatureLayer, Polyline polyline, Geometry graphic2) {
 		SimpleFillSymbol SYM_FILL_DIFF = new SimpleFillSymbol(new Color(0, 0, 200, 120), new SimpleLineSymbol(Color.RED, 6));
